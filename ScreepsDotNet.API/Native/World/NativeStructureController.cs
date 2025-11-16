@@ -1,100 +1,92 @@
-﻿using System;
+﻿using ScreepsDotNet.API.World;
 using ScreepsDotNet.Interop;
 
-using ScreepsDotNet.API.World;
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructureController : NativeOwnedStructure, IStructureController {
+		#region Imports
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructureController : NativeOwnedStructure, IStructureController
-    {
-        #region Imports
+		[JSImport("StructureController.activateSafeMode", "game/prototypes/wrapped")]
 
-        [JSImport("StructureController.activateSafeMode", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_ActivateSafeMode(JSObject proxyObject);
+		internal static partial int Native_ActivateSafeMode(JSObject proxyObject);
 
-        [JSImport("StructureController.unclaim", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Unclaim(JSObject proxyObject);
+		[JSImport("StructureController.unclaim", "game/prototypes/wrapped")]
 
-        #endregion
+		internal static partial int Native_Unclaim(JSObject proxyObject);
 
-        private bool? isPowerEnabledCache;
-        private int? levelCache;
-        private int? progressCache;
-        private int? progressTotalCache;
-        private ControllerReservation? reservationCache;
-        private int? safeModeCache;
-        private int? safeModeAvailableCache;
-        private int? safeModeCooldownCache;
-        private ControllerSign? signCache;
-        private int? ticksToDowngradeCache;
-        private int? upgradeBlockedCache;
+		#endregion
 
-        public bool IsPowerEnabled => CachePerTick(ref isPowerEnabledCache) ??= ProxyObject.GetPropertyAsBoolean(Names.IsPowerEnabled);
+		private bool? isPowerEnabledCache;
+		private int? levelCache;
+		private int? progressCache;
+		private int? progressTotalCache;
+		private ControllerReservation? reservationCache;
+		private int? safeModeCache;
+		private int? safeModeAvailableCache;
+		private int? safeModeCooldownCache;
+		private ControllerSign? signCache;
+		private int? ticksToDowngradeCache;
+		private int? upgradeBlockedCache;
 
-        public int Level => CachePerTick(ref levelCache) ??= ProxyObject.GetPropertyAsInt32(Names.Level);
+		public bool IsPowerEnabled => CachePerTick(ref isPowerEnabledCache) ??= ProxyObject.GetPropertyAsBoolean(Names.IsPowerEnabled);
 
-        public int Progress => CachePerTick(ref progressCache) ??= ProxyObject.GetPropertyAsInt32(Names.Progress);
+		public int Level => CachePerTick(ref levelCache) ??= ProxyObject.GetPropertyAsInt32(Names.Level);
 
-        public int ProgressTotal => CachePerTick(ref progressTotalCache) ??= ProxyObject.GetPropertyAsInt32(Names.ProgressTotal);
+		public int Progress => CachePerTick(ref progressCache) ??= ProxyObject.GetPropertyAsInt32(Names.Progress);
 
-        public ControllerReservation? Reservation => CachePerTick(ref reservationCache) ??= FetchReservation();
+		public int ProgressTotal => CachePerTick(ref progressTotalCache) ??= ProxyObject.GetPropertyAsInt32(Names.ProgressTotal);
 
-        public int? SafeMode => CachePerTick(ref safeModeCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.SafeMode);
+		public ControllerReservation? Reservation => CachePerTick(ref reservationCache) ??= FetchReservation();
 
-        public int SafeModeAvailable => CachePerTick(ref safeModeAvailableCache) ??= ProxyObject.GetPropertyAsInt32(Names.SafeModeAvailable);
+		public int? SafeMode => CachePerTick(ref safeModeCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.SafeMode);
 
-        public int? SafeModeCooldown => CachePerTick(ref safeModeCooldownCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.SafeModeCooldown);
+		public int SafeModeAvailable => CachePerTick(ref safeModeAvailableCache) ??= ProxyObject.GetPropertyAsInt32(Names.SafeModeAvailable);
 
-        public ControllerSign? Sign => CachePerTick(ref signCache) ?? FetchSign();
+		public int? SafeModeCooldown => CachePerTick(ref safeModeCooldownCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.SafeModeCooldown);
 
-        public int TicksToDowngrade => CachePerTick(ref ticksToDowngradeCache) ??= ProxyObject.GetPropertyAsInt32(Names.TicksToDowngrade);
+		public ControllerSign? Sign => CachePerTick(ref signCache) ?? FetchSign();
 
-        public int UpgradeBlocked => CachePerTick(ref upgradeBlockedCache) ??= ProxyObject.GetPropertyAsInt32(Names.UpgradeBlocked);
+		public int TicksToDowngrade => CachePerTick(ref ticksToDowngradeCache) ??= ProxyObject.GetPropertyAsInt32(Names.TicksToDowngrade);
 
-        public NativeStructureController(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject, ownershipCanChange: true)
-        { }
+		public int UpgradeBlocked => CachePerTick(ref upgradeBlockedCache) ??= ProxyObject.GetPropertyAsInt32(Names.UpgradeBlocked);
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            isPowerEnabledCache = null;
-            levelCache = null;
-            progressCache = null;
-            progressTotalCache = null;
-            reservationCache = null;
-            safeModeCache = null;
-            safeModeAvailableCache = null;
-            safeModeCooldownCache = null;
-            signCache = null;
-            ticksToDowngradeCache = null;
-            upgradeBlockedCache = null;
-    }
+		public NativeStructureController(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject, ownershipCanChange: true) { }
 
-        public ControllerActivateSafeModeResult ActivateSafeMode()
-            => (ControllerActivateSafeModeResult)Native_ActivateSafeMode(ProxyObject);
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			isPowerEnabledCache = null;
+			levelCache = null;
+			progressCache = null;
+			progressTotalCache = null;
+			reservationCache = null;
+			safeModeCache = null;
+			safeModeAvailableCache = null;
+			safeModeCooldownCache = null;
+			signCache = null;
+			ticksToDowngradeCache = null;
+			upgradeBlockedCache = null;
+		}
 
-        public ControllerUnclaimResult Unclaim()
-            => (ControllerUnclaimResult)Native_Unclaim(ProxyObject);
+		public ControllerActivateSafeModeResult ActivateSafeMode()
+			=> (ControllerActivateSafeModeResult)Native_ActivateSafeMode(ProxyObject);
 
-        private ControllerReservation? FetchReservation()
-        {
-            using var obj = ProxyObject.GetPropertyAsJSObject(Names.Reservation);
-            if (obj == null) { return null; }
-            return new(obj.GetPropertyAsString(Names.Username)!, obj.GetPropertyAsInt32(Names.TicksToEnd));
-        }
+		public ControllerUnclaimResult Unclaim()
+			=> (ControllerUnclaimResult)Native_Unclaim(ProxyObject);
 
-        private ControllerSign? FetchSign()
-        {
-            using var obj = ProxyObject.GetPropertyAsJSObject(Names.Sign);
-            if (obj == null) { return null; }
-            return new(obj.GetPropertyAsString(Names.Username)!, obj.GetPropertyAsString(Names.Text)!, obj.GetPropertyAsInt32(Names.Time), obj.GetPropertyAsJSObject(Names.Datetime)!.ToDateTime());
-        }
+		private ControllerReservation? FetchReservation() {
+			using var obj = ProxyObject.GetPropertyAsJSObject(Names.Reservation);
+			if (obj == null) { return null; }
+			return new(obj.GetPropertyAsString(Names.Username)!, obj.GetPropertyAsInt32(Names.TicksToEnd));
+		}
 
-        public override string ToString()
-            => $"StructureController[{Id}]";
-    }
+		private ControllerSign? FetchSign() {
+			using var obj = ProxyObject.GetPropertyAsJSObject(Names.Sign);
+			if (obj == null) { return null; }
+			return new(obj.GetPropertyAsString(Names.Username)!, obj.GetPropertyAsString(Names.Text)!, obj.GetPropertyAsInt32(Names.Time), obj.GetPropertyAsJSObject(Names.Datetime)!.ToDateTime());
+		}
+
+		public override string ToString()
+			=> $"StructureController[{Id}]";
+	}
 }

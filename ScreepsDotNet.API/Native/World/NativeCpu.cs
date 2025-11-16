@@ -1,106 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
-using ScreepsDotNet.Interop;
+
 using ScreepsDotNet.API;
 using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeCpu : ICpu
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeCpu : ICpu {
+		#region Imports
 
-        [JSImport("cpu.getHeapStatistics", "game")]
-        
-        internal static partial JSObject Native_GetHeapStatistics();
+		[JSImport("cpu.getHeapStatistics", "game")]
 
-        [JSImport("cpu.getUsed", "game")]
-        
-        internal static partial double Native_GetUsed();
+		internal static partial JSObject Native_GetHeapStatistics();
 
-        [JSImport("cpu.halt", "game")]
-        internal static partial void Native_Halt();
+		[JSImport("cpu.getUsed", "game")]
 
-        [JSImport("cpu.setShardLimits", "game")]
-        
-        internal static partial int Native_SetShardLimits(JSObject newShardLimits);
+		internal static partial double Native_GetUsed();
 
-        [JSImport("cpu.unlock", "game")]
-        
-        internal static partial int Native_Unlock();
+		[JSImport("cpu.halt", "game")]
+		internal static partial void Native_Halt();
 
-        [JSImport("cpu.generatePixel", "game")]
-        
-        internal static partial int Native_GeneratePixel();
+		[JSImport("cpu.setShardLimits", "game")]
 
-        #endregion
+		internal static partial int Native_SetShardLimits(JSObject newShardLimits);
 
-        private JSObject proxyObject;
+		[JSImport("cpu.unlock", "game")]
 
-        internal JSObject ProxyObject
-        {
-            get => proxyObject;
-            set
-            {
-                proxyObject = value;
-            }
-        }
+		internal static partial int Native_Unlock();
 
-        public double Limit => ProxyObject.GetPropertyAsDouble(Names.Limit);
+		[JSImport("cpu.generatePixel", "game")]
 
-        public double TickLimit => ProxyObject.GetPropertyAsDouble(Names.TickLimit);
+		internal static partial int Native_GeneratePixel();
 
-        public double Bucket => ProxyObject.GetPropertyAsDouble(Names.Bucket);
+		#endregion
 
-        public IReadOnlyDictionary<string, double> ShardLimits => throw new NotImplementedException();
+		private JSObject proxyObject;
 
-        public bool Unlocked =>  ProxyObject.GetPropertyAsBoolean(Names.Unlocked);
+		internal JSObject ProxyObject {
+			get => proxyObject;
+			set {
+				proxyObject = value;
+			}
+		}
 
-        public long? UnlockedTime => ProxyObject.TryGetPropertyAsInt32(Names.UnlockedTime);
+		public double Limit => ProxyObject.GetPropertyAsDouble(Names.Limit);
 
-        public NativeCpu(JSObject proxyObject)
-        {
-            this.proxyObject = proxyObject;
-        }
+		public double TickLimit => ProxyObject.GetPropertyAsDouble(Names.TickLimit);
 
-        public HeapInfo GetHeapStatistics()
-        {
-            using var obj = Native_GetHeapStatistics();
-            return new HeapInfo(
-                obj.GetPropertyAsInt32("total_heap_size"),
-                obj.GetPropertyAsInt32("total_heap_size_executable"),
-                obj.GetPropertyAsInt32("total_physical_size"),
-                obj.GetPropertyAsInt32("total_available_size"),
-                obj.GetPropertyAsInt32("used_heap_size"),
-                obj.GetPropertyAsInt32("heap_size_limit"),
-                obj.GetPropertyAsInt32("malloced_memory"),
-                obj.GetPropertyAsInt32("peak_malloced_memory"),
-                obj.GetPropertyAsInt32("does_zap_garbage"),
-                obj.GetPropertyAsInt32("externally_allocated_size")
-            );
-        }
+		public double Bucket => ProxyObject.GetPropertyAsDouble(Names.Bucket);
 
-        public double GetUsed()
-            => Native_GetUsed();
+		public IReadOnlyDictionary<string, double> ShardLimits => throw new NotImplementedException();
 
-        public void Halt()
-            => Native_Halt();
+		public bool Unlocked => ProxyObject.GetPropertyAsBoolean(Names.Unlocked);
 
-        public CpuSetShardLimitsResult SetShardLimits(IReadOnlyDictionary<string, double> shardLimits)
-        {
-            using var obj = JSObject.Create();
-            foreach (var pair in shardLimits)
-            {
-                obj.SetProperty(pair.Key, pair.Value);
-            }
-            return (CpuSetShardLimitsResult)Native_SetShardLimits(obj);
-        }
+		public long? UnlockedTime => ProxyObject.TryGetPropertyAsInt32(Names.UnlockedTime);
 
-        public CpuUnlockResult Unlock()
-            => (CpuUnlockResult)Native_Unlock();
+		public NativeCpu(JSObject proxyObject) {
+			this.proxyObject = proxyObject;
+		}
 
-        public CpuGeneratePixelResult GeneratePixel()
-            => (CpuGeneratePixelResult)Native_GeneratePixel();
-    }
+		public HeapInfo GetHeapStatistics() {
+			using var obj = Native_GetHeapStatistics();
+			return new HeapInfo(
+				obj.GetPropertyAsInt32("total_heap_size"),
+				obj.GetPropertyAsInt32("total_heap_size_executable"),
+				obj.GetPropertyAsInt32("total_physical_size"),
+				obj.GetPropertyAsInt32("total_available_size"),
+				obj.GetPropertyAsInt32("used_heap_size"),
+				obj.GetPropertyAsInt32("heap_size_limit"),
+				obj.GetPropertyAsInt32("malloced_memory"),
+				obj.GetPropertyAsInt32("peak_malloced_memory"),
+				obj.GetPropertyAsInt32("does_zap_garbage"),
+				obj.GetPropertyAsInt32("externally_allocated_size")
+			);
+		}
+
+		public double GetUsed()
+			=> Native_GetUsed();
+
+		public void Halt()
+			=> Native_Halt();
+
+		public CpuSetShardLimitsResult SetShardLimits(IReadOnlyDictionary<string, double> shardLimits) {
+			using var obj = JSObject.Create();
+			foreach (var pair in shardLimits) {
+				obj.SetProperty(pair.Key, pair.Value);
+			}
+			return (CpuSetShardLimitsResult)Native_SetShardLimits(obj);
+		}
+
+		public CpuUnlockResult Unlock()
+			=> (CpuUnlockResult)Native_Unlock();
+
+		public CpuGeneratePixelResult GeneratePixel()
+			=> (CpuGeneratePixelResult)Native_GeneratePixel();
+	}
 }

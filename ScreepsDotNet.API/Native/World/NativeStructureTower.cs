@@ -1,50 +1,47 @@
-﻿using ScreepsDotNet.Interop;
-using ScreepsDotNet.API.World;
+﻿using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructureTower : NativeOwnedStructureWithStore, IStructureTower
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructureTower : NativeOwnedStructureWithStore, IStructureTower {
+		#region Imports
 
-        [JSImport("StructureTower.attack", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Attack(JSObject proxyObject, JSObject target);
+		[JSImport("StructureTower.attack", "game/prototypes/wrapped")]
 
-        [JSImport("StructureTower.heal", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Heal(JSObject proxyObject, JSObject target);
+		internal static partial int Native_Attack(JSObject proxyObject, JSObject target);
 
-        [JSImport("StructureTower.repair", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Repair(JSObject proxyObject, JSObject target);
+		[JSImport("StructureTower.heal", "game/prototypes/wrapped")]
 
-        #endregion
+		internal static partial int Native_Heal(JSObject proxyObject, JSObject target);
 
-        public NativeStructureTower(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		[JSImport("StructureTower.repair", "game/prototypes/wrapped")]
 
-        public TowerActionResult Attack(ICreep target)
-            => (TowerActionResult)Native_Attack(ProxyObject, target.ToJS());
+		internal static partial int Native_Repair(JSObject proxyObject, JSObject target);
 
-        public TowerActionResult Attack(IPowerCreep target)
-            => (TowerActionResult)Native_Attack(ProxyObject, target.ToJS());
+		#endregion
 
-        public TowerActionResult Attack(IStructure target)
-            => (TowerActionResult)Native_Attack(ProxyObject, target.ToJS());
+		public NativeStructureTower(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        public TowerActionResult Heal(ICreep target)
-            => (TowerActionResult)Native_Heal(ProxyObject, target.ToJS());
+		public TowerActionResult Attack(ICreep target)
+			=> (TowerActionResult)Native_Attack(ProxyObject, target.ToJS());
 
-        public TowerActionResult Heal(IPowerCreep target)
-            => (TowerActionResult)Native_Heal(ProxyObject, target.ToJS());
+		public TowerActionResult Attack(IPowerCreep target)
+			=> (TowerActionResult)Native_Attack(ProxyObject, target.ToJS());
 
-        public TowerActionResult Repair(IStructure target)
-            => (TowerActionResult)Native_Repair(ProxyObject, target.ToJS());
+		public TowerActionResult Attack(IStructure target)
+			=> (TowerActionResult)Native_Attack(ProxyObject, target.ToJS());
 
-        public override string ToString()
-            => $"StructureTower[{Id}]";
-    }
+		public TowerActionResult Heal(ICreep target)
+			=> (TowerActionResult)Native_Heal(ProxyObject, target.ToJS());
+
+		public TowerActionResult Heal(IPowerCreep target)
+			=> (TowerActionResult)Native_Heal(ProxyObject, target.ToJS());
+
+		public TowerActionResult Repair(IStructure target)
+			=> (TowerActionResult)Native_Repair(ProxyObject, target.ToJS());
+
+		public override string ToString()
+			=> $"StructureTower[{Id}]";
+	}
 }

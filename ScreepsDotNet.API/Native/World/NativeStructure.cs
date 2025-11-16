@@ -1,58 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ScreepsDotNet.API.World;
 using ScreepsDotNet.Interop;
 
-using ScreepsDotNet.API.World;
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructure : NativeRoomObjectWithId, IStructure {
+		#region Imports
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructure : NativeRoomObjectWithId, IStructure
-    {
-        #region Imports
+		[JSImport("Structure.destroy", "game/prototypes/wrapped")]
 
-        [JSImport("Structure.destroy", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Destroy(JSObject proxyObject);
+		internal static partial int Native_Destroy(JSObject proxyObject);
 
-        [JSImport("Structure.isActive", "game/prototypes/wrapped")]
-        
-        internal static partial bool Native_IsActive(JSObject proxyObject);
+		[JSImport("Structure.isActive", "game/prototypes/wrapped")]
 
-        [JSImport("Structure.notifyWhenAttacked", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_NotifyWhenAttacked(JSObject proxyObject, bool enabled);
+		internal static partial bool Native_IsActive(JSObject proxyObject);
 
-        #endregion
+		[JSImport("Structure.notifyWhenAttacked", "game/prototypes/wrapped")]
 
-        private int? hitsCache;
-        private int? hitsMaxCache;
+		internal static partial int Native_NotifyWhenAttacked(JSObject proxyObject, bool enabled);
 
-        public int Hits => CachePerTick(ref hitsCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.Hits) ?? 0;
+		#endregion
 
-        public int HitsMax => CachePerTick(ref hitsMaxCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.HitsMax) ?? 0;
+		private int? hitsCache;
+		private int? hitsMaxCache;
 
-        public NativeStructure(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		public int Hits => CachePerTick(ref hitsCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.Hits) ?? 0;
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            hitsCache = null;
-            hitsMaxCache = null;
-        }
+		public int HitsMax => CachePerTick(ref hitsMaxCache) ??= ProxyObject.TryGetPropertyAsInt32(Names.HitsMax) ?? 0;
 
-        public StructureDestroyResult Destroy()
-            => (StructureDestroyResult)Native_Destroy(ProxyObject);
+		public NativeStructure(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        public bool IsActive()
-            => Native_IsActive(ProxyObject);
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			hitsCache = null;
+			hitsMaxCache = null;
+		}
 
-        public StructureNotifyWhenAttackedResult NotifyWhenAttacked(bool enabled)
-            => (StructureNotifyWhenAttackedResult)Native_NotifyWhenAttacked(ProxyObject, enabled);
+		public StructureDestroyResult Destroy()
+			=> (StructureDestroyResult)Native_Destroy(ProxyObject);
 
-        public override string ToString()
-            => $"NativeStructure[{Id}]";
-    }
+		public bool IsActive()
+			=> Native_IsActive(ProxyObject);
+
+		public StructureNotifyWhenAttackedResult NotifyWhenAttacked(bool enabled)
+			=> (StructureNotifyWhenAttackedResult)Native_NotifyWhenAttacked(ProxyObject, enabled);
+
+		public override string ToString()
+			=> $"NativeStructure[{Id}]";
+	}
 }

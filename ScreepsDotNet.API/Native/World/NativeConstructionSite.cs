@@ -1,52 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using ScreepsDotNet.Interop;
 
 using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeConstructionSite : NativeRoomObjectWithId, IConstructionSite
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeConstructionSite : NativeRoomObjectWithId, IConstructionSite {
+		#region Imports
 
-        [JSImport("ConstructionSite.remove", "game/prototypes/wrapped")]
-        internal static partial int Native_Remove(JSObject proxyObject);
+		[JSImport("ConstructionSite.remove", "game/prototypes/wrapped")]
+		internal static partial int Native_Remove(JSObject proxyObject);
 
-        #endregion
+		#endregion
 
-        private bool? myCache;
-        private OwnerInfo? ownerInfoCache;
-        private Type? structureTypeCache;
-        private int? progressCache;
-        private int? progressTotalCache;
+		private bool? myCache;
+		private OwnerInfo? ownerInfoCache;
+		private Type? structureTypeCache;
+		private int? progressCache;
+		private int? progressTotalCache;
 
-        public bool My => CacheLifetime(ref myCache) ??= ProxyObject.GetPropertyAsBoolean(Names.My);
+		public bool My => CacheLifetime(ref myCache) ??= ProxyObject.GetPropertyAsBoolean(Names.My);
 
-        public OwnerInfo Owner => CacheLifetime(ref ownerInfoCache) ??= new(ProxyObject.GetPropertyAsJSObject(Names.Owner)!.GetPropertyAsString(Names.Username)!);
+		public OwnerInfo Owner => CacheLifetime(ref ownerInfoCache) ??= new(ProxyObject.GetPropertyAsJSObject(Names.Owner)!.GetPropertyAsString(Names.Username)!);
 
-        public int Progress => CachePerTick(ref progressCache) ??= ProxyObject.GetPropertyAsInt32(Names.Progress);
+		public int Progress => CachePerTick(ref progressCache) ??= ProxyObject.GetPropertyAsInt32(Names.Progress);
 
-        public int ProgressTotal => CachePerTick(ref progressTotalCache) ??= ProxyObject.GetPropertyAsInt32(Names.ProgressTotal);
+		public int ProgressTotal => CachePerTick(ref progressTotalCache) ??= ProxyObject.GetPropertyAsInt32(Names.ProgressTotal);
 
-        public Type StructureType => CacheLifetime(ref structureTypeCache) ??= (NativeRoomObjectUtils.GetInterfaceTypeForStructureConstant(ProxyObject.GetPropertyAsString(Names.StructureType)!) ?? typeof(IStructure));
+		public Type StructureType => CacheLifetime(ref structureTypeCache) ??= (NativeRoomObjectUtils.GetInterfaceTypeForStructureConstant(ProxyObject.GetPropertyAsString(Names.StructureType)!) ?? typeof(IStructure));
 
-        public NativeConstructionSite(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		public NativeConstructionSite(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            progressCache = null;
-            progressTotalCache = null;
-        }
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			progressCache = null;
+			progressTotalCache = null;
+		}
 
-        public void Remove()
-            => Native_Remove(ProxyObject);
+		public void Remove()
+			=> Native_Remove(ProxyObject);
 
-        public override string ToString()
-            => $"ConstructionSite[{Id}]";
-    }
+		public override string ToString()
+			=> $"ConstructionSite[{Id}]";
+	}
 }

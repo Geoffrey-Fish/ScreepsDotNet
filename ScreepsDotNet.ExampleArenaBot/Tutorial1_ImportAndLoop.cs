@@ -1,22 +1,13 @@
-﻿using System;
+﻿namespace ScreepsDotNet.ExampleArenaBot {
+	public class Tutorial1_LoopAndImport : IBot {
+		private readonly IGame game;
 
-using ScreepsDotNet.API.Arena;
-using ScreepsDotNet.API.Bot;
+		public Tutorial1_LoopAndImport(IGame game) {
+			this.game = game;
+		}
 
-namespace ScreepsDotNet.ExampleArenaBot
-{
-    public class Tutorial1_LoopAndImport : IBot
-    {
-        private readonly IGame game;
-
-        public Tutorial1_LoopAndImport(IGame game)
-        {
-            this.game = game;
-        }
-
-        public void Loop()
-        {
-            Console.WriteLine($"Current tick: {game.Utils.GetTicks()}");
-        }
-    }
+		public void Loop() {
+			Console.WriteLine($"Current tick: {game.Utils.GetTicks()}");
+		}
+	}
 }

@@ -1,48 +1,34 @@
-﻿using System;
-using System.Linq;
+﻿namespace ScreepsDotNet.ExampleArenaBot {
+	public class Tutorial3_FirstAttack : IBot {
+		private readonly IGame game;
 
-using ScreepsDotNet.API.Arena;
-using ScreepsDotNet.API.Bot;
+		public Tutorial3_FirstAttack(IGame game) {
+			this.game = game;
+		}
 
-namespace ScreepsDotNet.ExampleArenaBot
-{
-    public class Tutorial3_FirstAttack : IBot
-    {
-        private readonly IGame game;
+		public void Loop() {
+			var allCreeps = game.Utils.GetObjectsByType<ICreep>();
 
-        public Tutorial3_FirstAttack(IGame game)
-        {
-            this.game = game;
-        }
+			var myCreeps = allCreeps.Where(x => x.My);
+			if (!myCreeps.Any()) {
+				Console.WriteLine($"No friendly creeps found!");
+				return;
+			}
 
-        public void Loop()
-        {
-            var allCreeps = game.Utils.GetObjectsByType<ICreep>();
+			var enemyCreeps = allCreeps.Where(x => !x.My);
+			if (!enemyCreeps.Any()) {
+				Console.WriteLine($"No enemy creeps found!");
+				return;
+			}
 
-            var myCreeps = allCreeps.Where(x => x.My);
-            if (!myCreeps.Any())
-            {
-                Console.WriteLine($"No friendly creeps found!");
-                return;
-            }
-
-            var enemyCreeps = allCreeps.Where(x => !x.My);
-            if (!enemyCreeps.Any())
-            {
-                Console.WriteLine($"No enemy creeps found!");
-                return;
-            }
-
-            foreach (var myCreep in myCreeps)
-            {
-                var enemyCreep = enemyCreeps.First();
-                Console.WriteLine($"Attemping to attack {enemyCreep} with {myCreep}");
-                if (myCreep.Attack(enemyCreep) == CreepAttackResult.NotInRange)
-                {
-                    Console.WriteLine($"Out of range, moving...");
-                    myCreep.MoveTo(enemyCreep);
-                }
-            }
-        }
-    }
+			foreach (var myCreep in myCreeps) {
+				var enemyCreep = enemyCreeps.First();
+				Console.WriteLine($"Attemping to attack {enemyCreep} with {myCreep}");
+				if (myCreep.Attack(enemyCreep) == CreepAttackResult.NotInRange) {
+					Console.WriteLine($"Out of range, moving...");
+					myCreep.MoveTo(enemyCreep);
+				}
+			}
+		}
+	}
 }

@@ -1,167 +1,151 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScreepsDotNet.Interop;
 
 using ScreepsDotNet.API;
 using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    using BodyType = BodyType<BodyPartType>;
+namespace ScreepsDotNet.Native.World {
+	using BodyType = BodyType<BodyPartType>;
 
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeSpawning : ISpawning, IDisposable
-    {
-        #region Imports
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeSpawning : ISpawning, IDisposable {
+		#region Imports
 
-        [JSImport("Spawning.cancel", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Cancel(JSObject proxyObject);
+		[JSImport("Spawning.cancel", "game/prototypes/wrapped")]
 
-        [JSImport("Spawning.setDirections", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_SetDirections(JSObject proxyObject, int[] directions);
+		internal static partial int Native_Cancel(JSObject proxyObject);
 
-        #endregion
+		[JSImport("Spawning.setDirections", "game/prototypes/wrapped")]
 
-        private readonly INativeRoot nativeRoot;
-        private readonly JSObject proxyObject;
-        private bool disposedValue;
+		internal static partial int Native_SetDirections(JSObject proxyObject, int[] directions);
 
-        public int NeedTime => proxyObject.GetPropertyAsInt32(Names.NeedTime);
+		#endregion
 
-        public int RemainingTime => proxyObject.GetPropertyAsInt32(Names.RemainingTime);
+		private readonly INativeRoot nativeRoot;
+		private readonly JSObject proxyObject;
+		private bool disposedValue;
 
-        public IEnumerable<Direction> Directions =>
-            (JSUtils.GetIntArrayOnObject(proxyObject, Names.Directions) ?? Enumerable.Empty<int>())
-                .Cast<Direction>();
+		public int NeedTime => proxyObject.GetPropertyAsInt32(Names.NeedTime);
 
-        public string Name => proxyObject.GetPropertyAsString(Names.Name)!;
+		public int RemainingTime => proxyObject.GetPropertyAsInt32(Names.RemainingTime);
 
-        public IStructureSpawn Spawn
-        {
-            get
-            {
-                var spawn = nativeRoot.GetOrCreateWrapperObject<IStructureSpawn>(proxyObject.GetPropertyAsJSObject(Names.Spawn));
-                if (spawn == null) { throw new InvalidOperationException($"ISpawning failed to retrieve spawn"); }
-                return spawn;
-            }
-        }
+		public IEnumerable<Direction> Directions =>
+			(JSUtils.GetIntArrayOnObject(proxyObject, Names.Directions) ?? Enumerable.Empty<int>())
+				.Cast<Direction>();
 
-        public NativeSpawning(INativeRoot nativeRoot, JSObject proxyObject)
-        {
-            this.nativeRoot = nativeRoot;
-            this.proxyObject = proxyObject;
-        }
+		public string Name => proxyObject.GetPropertyAsString(Names.Name)!;
 
-        public SpawningCancelResult Cancel()
-            => (SpawningCancelResult)Native_Cancel(proxyObject);
+		public IStructureSpawn Spawn {
+			get {
+				var spawn = nativeRoot.GetOrCreateWrapperObject<IStructureSpawn>(proxyObject.GetPropertyAsJSObject(Names.Spawn));
+				if (spawn == null) { throw new InvalidOperationException($"ISpawning failed to retrieve spawn"); }
+				return spawn;
+			}
+		}
 
-        public SpawningSetDirectionsResult SetDirections(IEnumerable<Direction> directions)
-            => (SpawningSetDirectionsResult)Native_SetDirections(proxyObject, directions.Cast<int>().ToArray());
+		public NativeSpawning(INativeRoot nativeRoot, JSObject proxyObject) {
+			this.nativeRoot = nativeRoot;
+			this.proxyObject = proxyObject;
+		}
 
-        #region IDisposable
+		public SpawningCancelResult Cancel()
+			=> (SpawningCancelResult)Native_Cancel(proxyObject);
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                proxyObject.Dispose();
-                disposedValue = true;
-            }
-        }
+		public SpawningSetDirectionsResult SetDirections(IEnumerable<Direction> directions)
+			=> (SpawningSetDirectionsResult)Native_SetDirections(proxyObject, directions.Cast<int>().ToArray());
 
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+		#region IDisposable
 
-        #endregion
-    }
+		protected virtual void Dispose(bool disposing) {
+			if (!disposedValue) {
+				proxyObject.Dispose();
+				disposedValue = true;
+			}
+		}
 
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal static class SpawnCreepOptionsExtensions
-    {
-        public static JSObject ToJS(this SpawnCreepOptions spawnCreepOptions)
-        {
-            var obj = JSObject.Create();
-            if (spawnCreepOptions.Memory != null) { obj.SetProperty(Names.Memory, spawnCreepOptions.Memory.ToJS()); }
-            if (spawnCreepOptions.EnergyStructures != null) { JSUtils.SetObjectArrayOnObject(obj, Names.EnergyStructures, spawnCreepOptions.EnergyStructures.Select(x => x.ToJS()).ToArray()); }
-            if (spawnCreepOptions.DryRun != null) { obj.SetProperty(Names.DryRun, spawnCreepOptions.DryRun.Value); }
-            if (spawnCreepOptions.Directions != null)
-            {
-                JSUtils.SetIntArrayOnObject(obj, Names.Directions, spawnCreepOptions.Directions.Cast<int>().ToArray());
-            }
-            return obj;
-        }
-    }
+		public void Dispose() {
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
 
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructureSpawn : NativeOwnedStructureWithStore, IStructureSpawn
-    {
-        #region Imports
+		#endregion
+	}
 
-        [JSImport("StructureSpawn.spawnCreep", "game/prototypes/wrapped")]
-        internal static partial int Native_SpawnCreep(JSObject proxyObject, Name[] body, string name, JSObject? opts);
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal static class SpawnCreepOptionsExtensions {
+		public static JSObject ToJS(this SpawnCreepOptions spawnCreepOptions) {
+			var obj = JSObject.Create();
+			if (spawnCreepOptions.Memory != null) { obj.SetProperty(Names.Memory, spawnCreepOptions.Memory.ToJS()); }
+			if (spawnCreepOptions.EnergyStructures != null) { JSUtils.SetObjectArrayOnObject(obj, Names.EnergyStructures, spawnCreepOptions.EnergyStructures.Select(x => x.ToJS()).ToArray()); }
+			if (spawnCreepOptions.DryRun != null) { obj.SetProperty(Names.DryRun, spawnCreepOptions.DryRun.Value); }
+			if (spawnCreepOptions.Directions != null) {
+				JSUtils.SetIntArrayOnObject(obj, Names.Directions, spawnCreepOptions.Directions.Cast<int>().ToArray());
+			}
+			return obj;
+		}
+	}
 
-        [JSImport("StructureSpawn.spawnCreep", "game/prototypes/wrapped")]
-        internal static partial int Native_SpawnCreep(JSObject proxyObject, Name[] body, string name);
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructureSpawn : NativeOwnedStructureWithStore, IStructureSpawn {
+		#region Imports
 
-        [JSImport("StructureSpawn.recycleCreep", "game/prototypes/wrapped")]
-        internal static partial int Native_RecycleCreep(JSObject proxyObject, JSObject target);
+		[JSImport("StructureSpawn.spawnCreep", "game/prototypes/wrapped")]
+		internal static partial int Native_SpawnCreep(JSObject proxyObject, Name[] body, string name, JSObject? opts);
 
-        [JSImport("StructureSpawn.renewCreep", "game/prototypes/wrapped")]
-        internal static partial int Native_RenewCreep(JSObject proxyObject, JSObject target);
+		[JSImport("StructureSpawn.spawnCreep", "game/prototypes/wrapped")]
+		internal static partial int Native_SpawnCreep(JSObject proxyObject, Name[] body, string name);
 
-        #endregion
+		[JSImport("StructureSpawn.recycleCreep", "game/prototypes/wrapped")]
+		internal static partial int Native_RecycleCreep(JSObject proxyObject, JSObject target);
 
-        private NativeMemoryObject? memoryCache;
-        private string? nameCache;
-        private NativeSpawning? spawningCache;
+		[JSImport("StructureSpawn.renewCreep", "game/prototypes/wrapped")]
+		internal static partial int Native_RenewCreep(JSObject proxyObject, JSObject target);
 
-        public IMemoryObject Memory => CachePerTick(ref memoryCache) ??= new NativeMemoryObject(ProxyObject.GetPropertyAsJSObject(Names.Memory)!);
+		#endregion
 
-        public string Name => CacheLifetime(ref nameCache) ??= ProxyObject.GetPropertyAsString(Names.Name)!;
+		private NativeMemoryObject? memoryCache;
+		private string? nameCache;
+		private NativeSpawning? spawningCache;
 
-        public ISpawning? Spawning => CachePerTick(ref spawningCache) ??= GetSpawning();
+		public IMemoryObject Memory => CachePerTick(ref memoryCache) ??= new NativeMemoryObject(ProxyObject.GetPropertyAsJSObject(Names.Memory)!);
 
-        public NativeStructureSpawn(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		public string Name => CacheLifetime(ref nameCache) ??= ProxyObject.GetPropertyAsString(Names.Name)!;
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            memoryCache = null;
-            spawningCache?.Dispose();
-            spawningCache = null;
-        }
+		public ISpawning? Spawning => CachePerTick(ref spawningCache) ??= GetSpawning();
 
-        public SpawnCreepResult SpawnCreep(IEnumerable<BodyPartType> body, string name, SpawnCreepOptions? opts = null)
-        {
-            using var optsJs = opts?.ToJS();
-            return (SpawnCreepResult)Native_SpawnCreep(ProxyObject, body.Select(x => x.ToJS()).ToArray(), name, optsJs);
-        }
+		public NativeStructureSpawn(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        public SpawnCreepResult SpawnCreep(BodyType bodyType, string name, SpawnCreepOptions? opts = null)
-            => SpawnCreep(bodyType.AsBodyPartList, name, opts);
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			memoryCache = null;
+			spawningCache?.Dispose();
+			spawningCache = null;
+		}
 
-        public RecycleCreepResult RecycleCreep(ICreep target)
-            => (RecycleCreepResult)Native_RecycleCreep(ProxyObject, target.ToJS());
+		public SpawnCreepResult SpawnCreep(IEnumerable<BodyPartType> body, string name, SpawnCreepOptions? opts = null) {
+			using var optsJs = opts?.ToJS();
+			return (SpawnCreepResult)Native_SpawnCreep(ProxyObject, body.Select(x => x.ToJS()).ToArray(), name, optsJs);
+		}
 
-        public RenewCreepResult RenewCreep(ICreep target)
-            => (RenewCreepResult)Native_RenewCreep(ProxyObject, target.ToJS());
+		public SpawnCreepResult SpawnCreep(BodyType bodyType, string name, SpawnCreepOptions? opts = null)
+			=> SpawnCreep(bodyType.AsBodyPartList, name, opts);
 
-        private NativeSpawning? GetSpawning()
-        {
-            var spawningObj = ProxyObject.GetPropertyAsJSObject(Names.Spawning);
-            if (spawningObj == null) { return null; }
-            return new NativeSpawning(nativeRoot, spawningObj);
-        }
+		public RecycleCreepResult RecycleCreep(ICreep target)
+			=> (RecycleCreepResult)Native_RecycleCreep(ProxyObject, target.ToJS());
 
-        public override string ToString()
-            => $"StructureSpawn[{(Exists ? $"'{Name}'" : Id.ToString())}]({(Exists ? $"{RoomPosition}" : "DEAD")})";
-    }
+		public RenewCreepResult RenewCreep(ICreep target)
+			=> (RenewCreepResult)Native_RenewCreep(ProxyObject, target.ToJS());
+
+		private NativeSpawning? GetSpawning() {
+			var spawningObj = ProxyObject.GetPropertyAsJSObject(Names.Spawning);
+			if (spawningObj == null) { return null; }
+			return new NativeSpawning(nativeRoot, spawningObj);
+		}
+
+		public override string ToString()
+			=> $"StructureSpawn[{(Exists ? $"'{Name}'" : Id.ToString())}]({(Exists ? $"{RoomPosition}" : "DEAD")})";
+	}
 }

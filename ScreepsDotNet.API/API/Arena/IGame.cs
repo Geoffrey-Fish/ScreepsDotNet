@@ -1,15 +1,13 @@
-﻿namespace ScreepsDotNet.API.Arena
-{
-    public interface IGame
-    {
-        IUtils Utils { get; }
+﻿namespace ScreepsDotNet.API.Arena {
+	public interface IGame {
+		IUtils Utils { get; }
 
-        IPathFinder PathFinder { get; }
+		IPathFinder PathFinder { get; }
 
-        IConstants Constants { get; }
+		IConstants Constants { get; }
 
-        IArenaInfo ArenaInfo { get; }
+		IArenaInfo ArenaInfo { get; }
 
-        void Tick();
-    }
+		void Tick();
+	}
 }

@@ -1,41 +1,37 @@
-﻿using ScreepsDotNet.Interop;
-using ScreepsDotNet.API.World;
+﻿using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructureFactory : NativeOwnedStructureWithStore, IStructureFactory
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructureFactory : NativeOwnedStructureWithStore, IStructureFactory {
+		#region Imports
 
-        [JSImport("StructureFactory.produce", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Produce(JSObject proxyObject, Name resourceType);
+		[JSImport("StructureFactory.produce", "game/prototypes/wrapped")]
 
-        #endregion
+		internal static partial int Native_Produce(JSObject proxyObject, Name resourceType);
 
-        private int? cooldownCache;
-        private int? levelCache;
+		#endregion
 
-        public int Cooldown => CachePerTick(ref cooldownCache) ??= ProxyObject.GetPropertyAsInt32(Names.Cooldown);
+		private int? cooldownCache;
+		private int? levelCache;
 
-        public int Level => CachePerTick(ref levelCache) ??= ProxyObject.GetPropertyAsInt32(Names.Level);
+		public int Cooldown => CachePerTick(ref cooldownCache) ??= ProxyObject.GetPropertyAsInt32(Names.Cooldown);
 
-        public NativeStructureFactory(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		public int Level => CachePerTick(ref levelCache) ??= ProxyObject.GetPropertyAsInt32(Names.Level);
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            cooldownCache = null;
-            levelCache = null;
-        }
+		public NativeStructureFactory(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        public FactoryProduceResult Produce(ResourceType resourceType)
-            => (FactoryProduceResult)Native_Produce(ProxyObject, resourceType.ToJS());
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			cooldownCache = null;
+			levelCache = null;
+		}
 
-        public override string ToString()
-            => $"StructureFactory[{Id}]";
-    }
+		public FactoryProduceResult Produce(ResourceType resourceType)
+			=> (FactoryProduceResult)Native_Produce(ProxyObject, resourceType.ToJS());
+
+		public override string ToString()
+			=> $"StructureFactory[{Id}]";
+	}
 }

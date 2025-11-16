@@ -1,40 +1,35 @@
-﻿using ScreepsDotNet.Interop;
-using ScreepsDotNet.API.World;
+﻿using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructureNuker : NativeOwnedStructureWithStore, IStructureNuker
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructureNuker : NativeOwnedStructureWithStore, IStructureNuker {
+		#region Imports
 
-        [JSImport("StructureNuker.launchNuke", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_LaunchNuke(JSObject proxyObject, JSObject pos);
+		[JSImport("StructureNuker.launchNuke", "game/prototypes/wrapped")]
 
-        #endregion
+		internal static partial int Native_LaunchNuke(JSObject proxyObject, JSObject pos);
 
-        private int? cooldownCache;
+		#endregion
 
-        public int Cooldown => CachePerTick(ref cooldownCache) ??= ProxyObject.GetPropertyAsInt32(Names.Cooldown);
+		private int? cooldownCache;
 
-        public NativeStructureNuker(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		public int Cooldown => CachePerTick(ref cooldownCache) ??= ProxyObject.GetPropertyAsInt32(Names.Cooldown);
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            cooldownCache = null;
-        }
+		public NativeStructureNuker(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        public NukerLaunchNukeResult LaunchNuke(RoomPosition pos)
-        {
-            using var roomPos = pos.ToJS();
-            return (NukerLaunchNukeResult)Native_LaunchNuke(ProxyObject, roomPos);
-        }
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			cooldownCache = null;
+		}
 
-        public override string ToString()
-            => $"StructureNuker[{Id}]";
-    }
+		public NukerLaunchNukeResult LaunchNuke(RoomPosition pos) {
+			using var roomPos = pos.ToJS();
+			return (NukerLaunchNukeResult)Native_LaunchNuke(ProxyObject, roomPos);
+		}
+
+		public override string ToString()
+			=> $"StructureNuker[{Id}]";
+	}
 }

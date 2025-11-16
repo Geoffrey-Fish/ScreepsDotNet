@@ -1,33 +1,31 @@
-﻿using ScreepsDotNet.Interop;
-using ScreepsDotNet.API.World;
+﻿using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeInterShardMemory : IInterShardMemory
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeInterShardMemory : IInterShardMemory {
+		#region Imports
 
-        [JSImport("interShardMemory.getLocal", "game")]
-        
-        internal static partial string? Native_GetLocal();
+		[JSImport("interShardMemory.getLocal", "game")]
 
-        [JSImport("interShardMemory.getRemote", "game")]
-        
-        internal static partial string? Native_GetRemote(string shard);
+		internal static partial string? Native_GetLocal();
 
-        [JSImport("interShardMemory.setLocal", "game")]
-        internal static partial void Native_SetLocal(string value);
+		[JSImport("interShardMemory.getRemote", "game")]
 
-        #endregion
+		internal static partial string? Native_GetRemote(string shard);
 
-        public string? GetLocal()
-            => Native_GetLocal();
+		[JSImport("interShardMemory.setLocal", "game")]
+		internal static partial void Native_SetLocal(string value);
 
-        public string? GetRemote(string shard)
-            => Native_GetRemote(shard);
+		#endregion
 
-        public void SetLocal(string value)
-            => Native_SetLocal(value);
-    }
+		public string? GetLocal()
+			=> Native_GetLocal();
+
+		public string? GetRemote(string shard)
+			=> Native_GetRemote(shard);
+
+		public void SetLocal(string value)
+			=> Native_SetLocal(value);
+	}
 }

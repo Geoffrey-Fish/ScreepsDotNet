@@ -3,141 +3,121 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-using ScreepsDotNet.Interop;
-
 using ScreepsDotNet.API;
 using ScreepsDotNet.API.Arena;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.Arena
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeSpawning : ISpawning, IDisposable
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.Arena {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeSpawning : ISpawning, IDisposable {
+		#region Imports
 
-        [JSImport("Spawning.cancel", "game/prototypes/wrapped")]
-        
-        internal static partial int? Native_Cancel(JSObject proxyObject);
+		[JSImport("Spawning.cancel", "game/prototypes/wrapped")]
 
-        public CancelSpawnCreepResult Cancel()
-        {
-            throw new NotImplementedException();
-        }
+		internal static partial int? Native_Cancel(JSObject proxyObject);
 
-        #endregion
+		public CancelSpawnCreepResult Cancel() {
+			throw new NotImplementedException();
+		}
 
-        private readonly INativeRoot nativeRoot;
-        private readonly JSObject proxyObject;
-        private bool disposedValue;
+		#endregion
 
-        private int? needTimeCache;
-        private int? remainingTimeCache;
-        private NativeCreep? creepCache;
+		private readonly INativeRoot nativeRoot;
+		private readonly JSObject proxyObject;
+		private bool disposedValue;
 
-        public int NeedTime
-        {
-            get
-            {
-                ObjectDisposedException.ThrowIf(disposedValue, this);
-                return needTimeCache ??= proxyObject.GetPropertyAsInt32(Names.NeedTime);
-            }
-        }
+		private int? needTimeCache;
+		private int? remainingTimeCache;
+		private NativeCreep? creepCache;
 
-        public int RemainingTime
-        {
-            get
-            {
-                ObjectDisposedException.ThrowIf(disposedValue, this);
-                return remainingTimeCache ??= proxyObject.GetPropertyAsInt32(Names.RemainingTime);
-            }
-        }
+		public int NeedTime {
+			get {
+				ObjectDisposedException.ThrowIf(disposedValue, this);
+				return needTimeCache ??= proxyObject.GetPropertyAsInt32(Names.NeedTime);
+			}
+		}
 
-        public ICreep Creep
-        {
-            get
-            {
-                ObjectDisposedException.ThrowIf(disposedValue, this);
-                return (creepCache ??= nativeRoot.GetOrCreateWrapperForObject<NativeCreep>(proxyObject.GetPropertyAsJSObject(Names.Creep)!))!;
-            }
-        }
+		public int RemainingTime {
+			get {
+				ObjectDisposedException.ThrowIf(disposedValue, this);
+				return remainingTimeCache ??= proxyObject.GetPropertyAsInt32(Names.RemainingTime);
+			}
+		}
 
-        public NativeSpawning(INativeRoot nativeRoot, JSObject proxyObject)
-        {
-            this.nativeRoot = nativeRoot;
-            this.proxyObject = proxyObject;
-        }
+		public ICreep Creep {
+			get {
+				ObjectDisposedException.ThrowIf(disposedValue, this);
+				return (creepCache ??= nativeRoot.GetOrCreateWrapperForObject<NativeCreep>(proxyObject.GetPropertyAsJSObject(Names.Creep)!))!;
+			}
+		}
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    proxyObject.Dispose();
-                }
+		public NativeSpawning(INativeRoot nativeRoot, JSObject proxyObject) {
+			this.nativeRoot = nativeRoot;
+			this.proxyObject = proxyObject;
+		}
 
-                disposedValue = true;
-            }
-        }
+		protected virtual void Dispose(bool disposing) {
+			if (!disposedValue) {
+				if (disposing) {
+					proxyObject.Dispose();
+				}
 
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-    }
+				disposedValue = true;
+			}
+		}
 
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeStructureSpawn : NativeOwnedStructure, IStructureSpawn
-    {
-        #region Imports
+		public void Dispose() {
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+	}
 
-        [JSImport("StructureSpawn.spawnCreep", "game/prototypes/wrapped")]
-        internal static partial JSObject Native_SpawnCreep(JSObject proxyObject, Name[] bodyParts);
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeStructureSpawn : NativeOwnedStructure, IStructureSpawn {
+		#region Imports
 
-        #endregion
+		[JSImport("StructureSpawn.spawnCreep", "game/prototypes/wrapped")]
+		internal static partial JSObject Native_SpawnCreep(JSObject proxyObject, Name[] bodyParts);
 
-        private NativeStore? storeCache;
-        private NativeSpawning? spawningCache;
+		#endregion
 
-        public IStore Store => CachePerTick(ref storeCache) ??= new NativeStore(proxyObject.GetPropertyAsJSObject(Names.Store));
+		private NativeStore? storeCache;
+		private NativeSpawning? spawningCache;
 
-        public ISpawning? Spawning => CachePerTick(ref spawningCache) ??= FetchSpawning();
+		public IStore Store => CachePerTick(ref storeCache) ??= new NativeStore(proxyObject.GetPropertyAsJSObject(Names.Store));
 
-        public NativeStructureSpawn(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        { }
+		public ISpawning? Spawning => CachePerTick(ref spawningCache) ??= FetchSpawning();
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            storeCache?.Dispose();
-            storeCache = null;
-            spawningCache?.Dispose();
-            spawningCache = null;
-        }
+		public NativeStructureSpawn(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) { }
 
-        public SpawnCreepResult SpawnCreep(IEnumerable<BodyPartType> body)
-        {
-            using var resultObj = Native_SpawnCreep(proxyObject, body.Select(x => x.ToJS()).ToArray()) ?? throw new InvalidOperationException($"StructureSpawn.spawnCreep returned null or undefined");
-            var creepObj = resultObj.GetPropertyAsJSObject(Names.Object);
-            int? error = resultObj.TryGetPropertyAsInt32(Names.Error);
-            return new SpawnCreepResult(creepObj != null ? nativeRoot.GetOrCreateWrapperForObject<NativeCreep>(creepObj) : null, (SpawnCreepError?)error);
-        }
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			storeCache?.Dispose();
+			storeCache = null;
+			spawningCache?.Dispose();
+			spawningCache = null;
+		}
 
-        public SpawnCreepResult SpawnCreep(BodyType<BodyPartType> bodyType)
-            => SpawnCreep(bodyType.AsBodyPartList);
+		public SpawnCreepResult SpawnCreep(IEnumerable<BodyPartType> body) {
+			using var resultObj = Native_SpawnCreep(proxyObject, body.Select(x => x.ToJS()).ToArray()) ?? throw new InvalidOperationException($"StructureSpawn.spawnCreep returned null or undefined");
+			var creepObj = resultObj.GetPropertyAsJSObject(Names.Object);
+			int? error = resultObj.TryGetPropertyAsInt32(Names.Error);
+			return new SpawnCreepResult(creepObj != null ? nativeRoot.GetOrCreateWrapperForObject<NativeCreep>(creepObj) : null, (SpawnCreepError?)error);
+		}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private NativeSpawning? FetchSpawning()
-        {
-            var spawningObj = proxyObject.GetPropertyAsJSObject(Names.Spawning);
-            if (spawningObj == null) { return null; }
-            return new NativeSpawning(nativeRoot, spawningObj);
-        }
+		public SpawnCreepResult SpawnCreep(BodyType<BodyPartType> bodyType)
+			=> SpawnCreep(bodyType.AsBodyPartList);
 
-        public override string ToString()
-            => $"StructureSpawn({Id}, {Position})";
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private NativeSpawning? FetchSpawning() {
+			var spawningObj = proxyObject.GetPropertyAsJSObject(Names.Spawning);
+			if (spawningObj == null) { return null; }
+			return new NativeSpawning(nativeRoot, spawningObj);
+		}
 
-    }
+		public override string ToString()
+			=> $"StructureSpawn({Id}, {Position})";
+
+	}
 }

@@ -1,88 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using ScreepsDotNet.Interop;
-
 using ScreepsDotNet.API;
 using ScreepsDotNet.API.World;
+using ScreepsDotNet.Interop;
 
-namespace ScreepsDotNet.Native.World
-{
-    [System.Runtime.Versioning.SupportedOSPlatform("wasi")]
-    internal partial class NativeFlag : NativeRoomObject, IFlag, IEquatable<NativeFlag?>
-    {
-        #region Imports
+namespace ScreepsDotNet.Native.World {
+	[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
+	internal partial class NativeFlag : NativeRoomObject, IFlag, IEquatable<NativeFlag?> {
+		#region Imports
 
-        [JSImport("Flag.remove", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_Remove(JSObject proxyObject);
+		[JSImport("Flag.remove", "game/prototypes/wrapped")]
 
-        [JSImport("Flag.setColor", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_SetColor(JSObject proxyObject, int color, int? secondaryColor);
+		internal static partial int Native_Remove(JSObject proxyObject);
 
-        [JSImport("Flag.setPosition", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_SetPosition(JSObject proxyObject, int x, int y);
+		[JSImport("Flag.setColor", "game/prototypes/wrapped")]
 
-        [JSImport("Flag.setPosition", "game/prototypes/wrapped")]
-        
-        internal static partial int Native_SetPosition(JSObject proxyObject, JSObject pos);
+		internal static partial int Native_SetColor(JSObject proxyObject, int color, int? secondaryColor);
 
-        #endregion
+		[JSImport("Flag.setPosition", "game/prototypes/wrapped")]
 
-        private readonly string name;
+		internal static partial int Native_SetPosition(JSObject proxyObject, int x, int y);
 
-        protected override bool CanMove => true;
+		[JSImport("Flag.setPosition", "game/prototypes/wrapped")]
 
-        private IMemoryObject? memoryCache;
+		internal static partial int Native_SetPosition(JSObject proxyObject, JSObject pos);
 
-        public FlagColor Color => (FlagColor)ProxyObject.GetPropertyAsInt32(Names.Color);
+		#endregion
 
-        public IMemoryObject Memory => CachePerTick(ref memoryCache) ??= new NativeMemoryObject(ProxyObject.GetPropertyAsJSObject(Names.Memory)!);
+		private readonly string name;
 
-        public string Name => name;
+		protected override bool CanMove => true;
 
-        public FlagColor SecondaryColor => (FlagColor)ProxyObject.GetPropertyAsInt32(Names.SecondaryColor);
+		private IMemoryObject? memoryCache;
 
-        public NativeFlag(INativeRoot nativeRoot, JSObject proxyObject)
-            : base(nativeRoot, proxyObject)
-        {
-            name = proxyObject?.GetPropertyAsString(Names.Name) ?? string.Empty;
-        }
+		public FlagColor Color => (FlagColor)ProxyObject.GetPropertyAsInt32(Names.Color);
 
-        public override JSObject? ReacquireProxyObject()
-            => nativeRoot.FlagsObj.GetPropertyAsJSObject(name);
+		public IMemoryObject Memory => CachePerTick(ref memoryCache) ??= new NativeMemoryObject(ProxyObject.GetPropertyAsJSObject(Names.Memory)!);
 
-        protected override void ClearNativeCache()
-        {
-            base.ClearNativeCache();
-            memoryCache = null;
-        }
+		public string Name => name;
 
-        public void Remove()
-            => Native_Remove(ProxyObject);
+		public FlagColor SecondaryColor => (FlagColor)ProxyObject.GetPropertyAsInt32(Names.SecondaryColor);
 
-        public FlagSetColorResult SetColor(FlagColor color, FlagColor? secondaryColor = null)
-            => (FlagSetColorResult)Native_SetColor(ProxyObject, (int)color, (int?)secondaryColor);
+		public NativeFlag(INativeRoot nativeRoot, JSObject proxyObject)
+			: base(nativeRoot, proxyObject) {
+			name = proxyObject?.GetPropertyAsString(Names.Name) ?? string.Empty;
+		}
 
-        public FlagSetPositionResult SetPosition(Position position)
-            => (FlagSetPositionResult)Native_SetPosition(ProxyObject, position.X, position.Y);
+		public override JSObject? ReacquireProxyObject()
+			=> nativeRoot.FlagsObj.GetPropertyAsJSObject(name);
 
-        public FlagSetPositionResult SetPosition(RoomPosition position)
-        {
-            using var posJs = position.ToJS();
-            return (FlagSetPositionResult)Native_SetPosition(ProxyObject, posJs);
-        }
+		protected override void ClearNativeCache() {
+			base.ClearNativeCache();
+			memoryCache = null;
+		}
 
-        public override bool Equals(object? obj) => Equals(obj as NativeFlag);
+		public void Remove()
+			=> Native_Remove(ProxyObject);
 
-        public bool Equals(NativeFlag? other) => other is not null && name == other.name;
+		public FlagSetColorResult SetColor(FlagColor color, FlagColor? secondaryColor = null)
+			=> (FlagSetColorResult)Native_SetColor(ProxyObject, (int)color, (int?)secondaryColor);
 
-        public override int GetHashCode() => HashCode.Combine(name);
+		public FlagSetPositionResult SetPosition(Position position)
+			=> (FlagSetPositionResult)Native_SetPosition(ProxyObject, position.X, position.Y);
 
-        public static bool operator ==(NativeFlag? left, NativeFlag? right) => EqualityComparer<NativeFlag>.Default.Equals(left, right);
+		public FlagSetPositionResult SetPosition(RoomPosition position) {
+			using var posJs = position.ToJS();
+			return (FlagSetPositionResult)Native_SetPosition(ProxyObject, posJs);
+		}
 
-        public static bool operator !=(NativeFlag? left, NativeFlag? right) => !(left == right);
-    }
+		public override bool Equals(object? obj) => Equals(obj as NativeFlag);
+
+		public bool Equals(NativeFlag? other) => other is not null && name == other.name;
+
+		public override int GetHashCode() => HashCode.Combine(name);
+
+		public static bool operator ==(NativeFlag? left, NativeFlag? right) => EqualityComparer<NativeFlag>.Default.Equals(left, right);
+
+		public static bool operator !=(NativeFlag? left, NativeFlag? right) => !(left == right);
+	}
 }

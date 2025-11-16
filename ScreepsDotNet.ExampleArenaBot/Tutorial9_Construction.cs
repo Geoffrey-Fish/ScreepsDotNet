@@ -1,100 +1,76 @@
-﻿using System;
-using System.Linq;
+﻿namespace ScreepsDotNet.ExampleArenaBot {
+	public class Tutorial9_Construction : IBot {
+		private readonly IGame game;
 
-using ScreepsDotNet.API.Arena;
-using ScreepsDotNet.API.Bot;
+		public Tutorial9_Construction(IGame game) {
+			this.game = game;
+		}
 
-namespace ScreepsDotNet.ExampleArenaBot
-{
-    public class Tutorial9_Construction : IBot
-    {
-        private readonly IGame game;
+		public void Loop() {
+			var allCreeps = game.Utils.GetObjectsByType<ICreep>();
 
-        public Tutorial9_Construction(IGame game)
-        {
-            this.game = game;
-        }
+			var myCreeps = allCreeps.Where(x => x.My);
+			if (!myCreeps.Any()) {
+				Console.WriteLine($"No friendly creeps found!");
+				return;
+			}
 
-        public void Loop()
-        {
-            var allCreeps = game.Utils.GetObjectsByType<ICreep>();
+			var container = game.Utils.GetObjectsByType<IStructureContainer>()
+				.Where(x => x.My ?? true)
+				.FirstOrDefault();
+			if (container == null) {
+				Console.WriteLine($"No containers found!");
+				return;
+			}
 
-            var myCreeps = allCreeps.Where(x => x.My);
-            if (!myCreeps.Any())
-            {
-                Console.WriteLine($"No friendly creeps found!");
-                return;
-            }
+			var constructionSite = game.Utils.GetObjectsByType<IConstructionSite>()
+				.Where(x => x.My)
+				.FirstOrDefault();
+			if (constructionSite == null) {
+				Console.WriteLine($"No construction site found, spawning at (50, 55)");
+				var result = game.Utils.CreateConstructionSite<IStructureTower>((50, 55));
+				if (result.Object != null) {
+					Console.WriteLine($"Created {result.Object})");
+					constructionSite = result.Object;
+				}
+				if (result.Error != null) {
+					Console.WriteLine($"Got unexpected error creating construction site {result.Error}");
+				}
+			}
 
-            var container = game.Utils.GetObjectsByType<IStructureContainer>()
-                .Where(x => x.My ?? true)
-                .FirstOrDefault();
-            if (container == null)
-            {
-                Console.WriteLine($"No containers found!");
-                return;
-            }
+			if (constructionSite == null) { return; }
 
-            var constructionSite = game.Utils.GetObjectsByType<IConstructionSite>()
-                .Where(x => x.My)
-                .FirstOrDefault();
-            if (constructionSite == null)
-            {
-                Console.WriteLine($"No construction site found, spawning at (50, 55)");
-                var result = game.Utils.CreateConstructionSite<IStructureTower>((50, 55));
-                if (result.Object != null)
-                {
-                    Console.WriteLine($"Created {result.Object})");
-                    constructionSite = result.Object;
-                }
-                if (result.Error != null)
-                {
-                    Console.WriteLine($"Got unexpected error creating construction site {result.Error}");
-                }
-            }
+			foreach (var myCreep in myCreeps) {
+				var energyStored = myCreep.Store[ResourceType.Energy];
+				var energySpace = myCreep.Store.GetFreeCapacity(ResourceType.Energy) ?? 0;
+				var energyAvailable = container.Store[ResourceType.Energy];
 
-            if (constructionSite == null) { return; }
+				// If we have energy, go to the construction site and build it
+				if (energyStored > 0) {
+					var buildResult = myCreep.Build(constructionSite);
+					if (buildResult == CreepBuildResult.NotInRange) {
+						myCreep.MoveTo(constructionSite);
 
-            foreach (var myCreep in myCreeps)
-            {
-                var energyStored = myCreep.Store[ResourceType.Energy];
-                var energySpace = myCreep.Store.GetFreeCapacity(ResourceType.Energy) ?? 0;
-                var energyAvailable = container.Store[ResourceType.Energy];
+					} else if (buildResult != CreepBuildResult.Ok) {
+						Console.WriteLine($"{myCreep}: Unexpected build result: {buildResult}");
+					}
+					continue;
+				}
 
-                // If we have energy, go to the construction site and build it
-                if (energyStored > 0)
-                {
-                    var buildResult = myCreep.Build(constructionSite);
-                    if (buildResult == CreepBuildResult.NotInRange)
-                    {
-                        myCreep.MoveTo(constructionSite);
+				// If there is energy available, go to the container and withdraw it
+				if (energyAvailable > 0) {
+					var withdrawResult = myCreep.Withdraw(container, ResourceType.Energy);
+					if (withdrawResult == CreepTransferResult.NotInRange) {
+						myCreep.MoveTo(container);
 
-                    }
-                    else if (buildResult != CreepBuildResult.Ok)
-                    {
-                        Console.WriteLine($"{myCreep}: Unexpected build result: {buildResult}");
-                    }
-                    continue;
-                }
+					} else if (withdrawResult != CreepTransferResult.Ok) {
+						Console.WriteLine($"{myCreep}: Unexpected withdraw result: {withdrawResult}");
+					}
+					continue;
+				}
 
-                // If there is energy available, go to the container and withdraw it
-                if (energyAvailable > 0)
-                {
-                    var withdrawResult = myCreep.Withdraw(container, ResourceType.Energy);
-                    if (withdrawResult == CreepTransferResult.NotInRange)
-                    {
-                        myCreep.MoveTo(container);
+			}
 
-                    }
-                    else if (withdrawResult != CreepTransferResult.Ok)
-                    {
-                        Console.WriteLine($"{myCreep}: Unexpected withdraw result: {withdrawResult}");
-                    }
-                    continue;
-                }
-
-            }
-
-        }
-    }
+		}
+	}
 }

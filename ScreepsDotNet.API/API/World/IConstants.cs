@@ -1,122 +1,116 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ScreepsDotNet.API.World
-{
-    public readonly struct ControllerConstants
-    {
-        private readonly int[] levels;
-        
-        private readonly IReadOnlyDictionary<Type, int[]> structureCounts;
-        private readonly int[] downgrade;
-        
-        public readonly int DowngradeRestore;
-        public readonly int DowngradeSafemodeThreshold;
-        public readonly int ClaimDowngrade;
-        public readonly int Reserve;
-        public readonly int ReserveMax;
-        public readonly int MaxUpgradePerTick;
-        public readonly int AttackBlockedUpgrade;
-        public readonly int NukeBlockedUpgrade;
+namespace ScreepsDotNet.API.World {
+	public readonly struct ControllerConstants {
+		private readonly int[] levels;
 
-        public ReadOnlySpan<int> Levels => levels ?? ReadOnlySpan<int>.Empty;
+		private readonly IReadOnlyDictionary<Type, int[]> structureCounts;
+		private readonly int[] downgrade;
 
-        public ReadOnlySpan<int> Downgrade => downgrade ?? ReadOnlySpan<int>.Empty;
+		public readonly int DowngradeRestore;
+		public readonly int DowngradeSafemodeThreshold;
+		public readonly int ClaimDowngrade;
+		public readonly int Reserve;
+		public readonly int ReserveMax;
+		public readonly int MaxUpgradePerTick;
+		public readonly int AttackBlockedUpgrade;
+		public readonly int NukeBlockedUpgrade;
 
-        public ControllerConstants(ReadOnlySpan<int> levels, IReadOnlyDictionary<Type, int[]> structureCounts, int[] downgrade, int downgradeRestore, int downgradeSafemodeThreshold, int claimDowngrade, int reserve, int reserveMax, int maxUpgradePerTick, int attackBlockedUpgrade, int nukeBlockedUpgrade)
-        {
-            this.levels = levels.ToArray();
-            this.structureCounts = structureCounts;
-            this.downgrade = downgrade;
-            DowngradeRestore = downgradeRestore;
-            DowngradeSafemodeThreshold = downgradeSafemodeThreshold;
-            ClaimDowngrade = claimDowngrade;
-            Reserve = reserve;
-            ReserveMax = reserveMax;
-            MaxUpgradePerTick = maxUpgradePerTick;
-            AttackBlockedUpgrade = attackBlockedUpgrade;
-            NukeBlockedUpgrade = nukeBlockedUpgrade;
-        }
+		public ReadOnlySpan<int> Levels => levels ?? ReadOnlySpan<int>.Empty;
 
-        public int GetMaxStructureCount<T>(int controllerLevel) where T : IStructure
-            => GetMaxStructureCount(typeof(T), controllerLevel);
+		public ReadOnlySpan<int> Downgrade => downgrade ?? ReadOnlySpan<int>.Empty;
 
-        public int GetMaxStructureCount(Type structureType, int controllerLevel)
-            => structureCounts.TryGetValue(structureType, out var arr) ? arr[controllerLevel] : 0;
-    }
+		public ControllerConstants(ReadOnlySpan<int> levels, IReadOnlyDictionary<Type, int[]> structureCounts, int[] downgrade, int downgradeRestore, int downgradeSafemodeThreshold, int claimDowngrade, int reserve, int reserveMax, int maxUpgradePerTick, int attackBlockedUpgrade, int nukeBlockedUpgrade) {
+			this.levels = levels.ToArray();
+			this.structureCounts = structureCounts;
+			this.downgrade = downgrade;
+			DowngradeRestore = downgradeRestore;
+			DowngradeSafemodeThreshold = downgradeSafemodeThreshold;
+			ClaimDowngrade = claimDowngrade;
+			Reserve = reserve;
+			ReserveMax = reserveMax;
+			MaxUpgradePerTick = maxUpgradePerTick;
+			AttackBlockedUpgrade = attackBlockedUpgrade;
+			NukeBlockedUpgrade = nukeBlockedUpgrade;
+		}
 
-    public readonly struct CreepConstants
-    {
-        public readonly int CreepLifeTime;
-        public readonly int CreepClaimLifeTime;
-        public readonly double CreepCorpseRate;
-        public readonly int CreepPartMaxEnergy;
+		public int GetMaxStructureCount<T>(int controllerLevel) where T : IStructure
+			=> GetMaxStructureCount(typeof(T), controllerLevel);
 
-        public readonly int CarryCapacity;
-        public readonly int HarvestPower;
-        public readonly int HarvestMineralPower;
-        public readonly int HarvestDepositPower;
-        public readonly int RepairPower;
-        public readonly int DismantlePower;
-        public readonly int BuildPower;
-        public readonly int AttackPower;
-        public readonly int UpgradeControllerPower;
-        public readonly int RangedAttackPower;
-        public readonly int HealPower;
-        public readonly int RangedHealPower;
-        public readonly double RepairCost;
-        public readonly double DismantleCost;
+		public int GetMaxStructureCount(Type structureType, int controllerLevel)
+			=> structureCounts.TryGetValue(structureType, out var arr) ? arr[controllerLevel] : 0;
+	}
 
-        public CreepConstants(
-            int creepLifeTime, int creepClaimLifeTime, double creepCorpseRate, int creepPartMaxEnergy,
-            int carryCapacity, int harvestPower, int harvestMineralPower, int harvestDepositPower, int repairPower, int dismantlePower, int buildPower, int attackPower, int upgradeControllerPower, int rangedAttackPower, int healPower, int rangedHealPower, double repairCost, double dismantleCost
-        )
-        {
-            CreepLifeTime = creepLifeTime;
-            CreepClaimLifeTime = creepClaimLifeTime;
-            CreepCorpseRate = creepCorpseRate;
-            CreepPartMaxEnergy = creepPartMaxEnergy;
-            CarryCapacity = carryCapacity;
-            HarvestPower = harvestPower;
-            HarvestMineralPower = harvestMineralPower;
-            HarvestDepositPower = harvestDepositPower;
-            RepairPower = repairPower;
-            DismantlePower = dismantlePower;
-            BuildPower = buildPower;
-            AttackPower = attackPower;
-            UpgradeControllerPower = upgradeControllerPower;
-            RangedAttackPower = rangedAttackPower;
-            HealPower = healPower;
-            RangedHealPower = rangedHealPower;
-            RepairCost = repairCost;
-            DismantleCost = dismantleCost;
-        }
-    }
+	public readonly struct CreepConstants {
+		public readonly int CreepLifeTime;
+		public readonly int CreepClaimLifeTime;
+		public readonly double CreepCorpseRate;
+		public readonly int CreepPartMaxEnergy;
 
-    public interface IConstants
-    {
-        ControllerConstants Controller { get; }
+		public readonly int CarryCapacity;
+		public readonly int HarvestPower;
+		public readonly int HarvestMineralPower;
+		public readonly int HarvestDepositPower;
+		public readonly int RepairPower;
+		public readonly int DismantlePower;
+		public readonly int BuildPower;
+		public readonly int AttackPower;
+		public readonly int UpgradeControllerPower;
+		public readonly int RangedAttackPower;
+		public readonly int HealPower;
+		public readonly int RangedHealPower;
+		public readonly double RepairCost;
+		public readonly double DismantleCost;
 
-        CreepConstants Creep { get; }
+		public CreepConstants(
+			int creepLifeTime, int creepClaimLifeTime, double creepCorpseRate, int creepPartMaxEnergy,
+			int carryCapacity, int harvestPower, int harvestMineralPower, int harvestDepositPower, int repairPower, int dismantlePower, int buildPower, int attackPower, int upgradeControllerPower, int rangedAttackPower, int healPower, int rangedHealPower, double repairCost, double dismantleCost
+		) {
+			CreepLifeTime = creepLifeTime;
+			CreepClaimLifeTime = creepClaimLifeTime;
+			CreepCorpseRate = creepCorpseRate;
+			CreepPartMaxEnergy = creepPartMaxEnergy;
+			CarryCapacity = carryCapacity;
+			HarvestPower = harvestPower;
+			HarvestMineralPower = harvestMineralPower;
+			HarvestDepositPower = harvestDepositPower;
+			RepairPower = repairPower;
+			DismantlePower = dismantlePower;
+			BuildPower = buildPower;
+			AttackPower = attackPower;
+			UpgradeControllerPower = upgradeControllerPower;
+			RangedAttackPower = rangedAttackPower;
+			HealPower = healPower;
+			RangedHealPower = rangedHealPower;
+			RepairCost = repairCost;
+			DismantleCost = dismantleCost;
+		}
+	}
 
-        IReadOnlyDictionary<(ResourceType, ResourceType), ResourceType> Reactions { get; }
+	public interface IConstants {
+		ControllerConstants Controller { get; }
 
-        bool IsObjectObstacle<T>() where T : IRoomObject;
+		CreepConstants Creep { get; }
 
-        bool IsObjectObstacle(Type objectType);
+		IReadOnlyDictionary<(ResourceType, ResourceType), ResourceType> Reactions { get; }
 
-        int GetBodyPartCost(BodyPartType bodyPartType);
+		bool IsObjectObstacle<T>() where T : IRoomObject;
 
-        int GetConstructionCost<T>() where T : IStructure;
+		bool IsObjectObstacle(Type objectType);
 
-        int GetConstructionCost(Type structureType);
+		int GetBodyPartCost(BodyPartType bodyPartType);
 
-        int GetRampartHitsMax(int rcl);
+		int GetConstructionCost<T>() where T : IStructure;
 
-        int? GetReactionTime(ResourceType product);
+		int GetConstructionCost(Type structureType);
 
-        int GetAsInt(string key);
+		int GetRampartHitsMax(int rcl);
 
-        double GetAsDouble(string key);
-    }
+		int? GetReactionTime(ResourceType product);
+
+		int GetAsInt(string key);
+
+		double GetAsDouble(string key);
+	}
 }
