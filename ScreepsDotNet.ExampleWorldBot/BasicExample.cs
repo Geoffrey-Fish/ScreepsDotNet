@@ -1,4 +1,11 @@
-﻿namespace ScreepsDotNet.ExampleWorldBot {
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using ScreepsDotNet.API.Bot;
+using ScreepsDotNet.API.World;
+
+namespace ScreepsDotNet.ExampleWorldBot {
 	public class BasicExample : IBot {
 		private readonly IGame game;
 

@@ -1,4 +1,11 @@
-﻿using ScreepsDotNet.ExampleWorldBot.Roles;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+
+using ScreepsDotNet.API;
+using ScreepsDotNet.API.World;
+using ScreepsDotNet.ExampleWorldBot.Roles;
 
 namespace ScreepsDotNet.ExampleWorldBot {
 	/// <summary>

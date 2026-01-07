@@ -1,7 +1,11 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+
 namespace ScreepsDotNet {
 	public static partial class Program {
 		private static API.World.IGame? game;
 		private static API.Bot.IBot? bot;
+
 
 		[DynamicDependency(DynamicallyAccessedMemberTypes.PublicMethods, typeof(Program))]
 		public static void Main() {
@@ -11,9 +15,9 @@ namespace ScreepsDotNet {
 		[System.Runtime.Versioning.SupportedOSPlatform("wasi")]
 		public static void Init() {
 			try {
-				game = new Native.World.NativeGame();
+				API.World.IGame game = new Native.World.NativeGame();
 				bot = new ExampleWorldBot.BasicExample(game);
-			} catch (Exception e) {
+			} catch (System.Exception e) {
 				Console.WriteLine(e);
 			}
 		}

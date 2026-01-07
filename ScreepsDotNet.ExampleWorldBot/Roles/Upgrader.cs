@@ -1,4 +1,11 @@
-﻿namespace ScreepsDotNet.ExampleWorldBot.Roles {
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using ScreepsDotNet.API;
+using ScreepsDotNet.API.World;
+
+namespace ScreepsDotNet.ExampleWorldBot.Roles {
 	/// <summary>
 	/// The upgrader role will instruct creeps to collect energy from the spawn, then upgrade the room controller.
 	/// Spawns will be cached to the heap for efficiency.
